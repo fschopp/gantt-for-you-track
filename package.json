@@ -1,6 +1,6 @@
 {
   "name": "@fschopp/gantt-for-you-track",
-  "version": "0.1.0",
+  "version": "0.2.0-SNAPSHOT",
   "description": "Gantt charts for YouTrack. Computes a project plan for the unresolved issues in a YouTrack saved search and visualizes it as Gantt chart, together with the past activity log.",
   "keywords": [
     "Gantt",
@@ -45,8 +45,8 @@
     "node": ">=10.0.0"
   },
   "dependencies": {
-    "@fschopp/project-planning-for-you-track": "^0.9.1",
-    "@fschopp/project-planning-ui-for-you-track": "^0.2.0",
+    "@fschopp/project-planning-for-you-track": "fschopp/project-planning-for-you-track#aa6d0767db87525004067aa464505f4eb78ec1a7",
+    "@fschopp/project-planning-ui-for-you-track": "fschopp/project-planning-ui-for-you-track#dd69f51f29a57f77101834f5fb980ccf29e9edb0",
     "dhtmlx-gantt": "^6.1.6",
     "s-js": "^0.4.9",
     "surplus": "^0.5.3",

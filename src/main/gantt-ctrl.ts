@@ -180,6 +180,11 @@ function propagateMinMaxTimestamps(nodes: Iterable<Node<GanttTask>>): void {
       parent.start_date =
           minDate(parent.start_date, child.start_date, (left, right) => left.getTime() - right.getTime());
       parent.end_date = minDate(parent.end_date, child.end_date, (left, right) => right.getTime() - left.getTime());
+      assert((parent.start_date === undefined) === (parent.end_date === undefined),
+          'Task start time should be defined if and only if end time is defined, too.');
+      if (parent.start_date !== undefined && parent.unscheduled !== undefined) {
+        delete parent.unscheduled;
+      }
     }
   }
 }
