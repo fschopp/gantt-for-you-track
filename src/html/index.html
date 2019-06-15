@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+<link rel="stylesheet" href="../css/index.css">
+<title>Gantt for YouTrack</title>
+
+<!-- A body element is not really necessary per HTML5 specification, but without the element here, document.body would
+     be null at the time the scripts run. -->
+<body class="d-flex flex-column vh-100">
+  <!-- Required because our browserslist settings includes older browsers without async/await support. Hence, the
+       transpilation results in code for which a runtime component is necessary. -->
+  <script src="https://cdn.jsdelivr.net/npm/@babel/polyfill@7.4.4/dist/polyfill.min.js"
+    integrity="sha256-lu1gm0Fb5u5n6tuNLefOZNE96ckovOjhNzvsl+Iz50w=" crossorigin="anonymous"></script>
+  <script src="../../target/main/index.js"></script>
+</body>

@@ -1,0 +1,14 @@
+/dist/
+/target/
+
+# IntelliJ, Visual Studio Code, ...
+/.idea/
+/*.iml
+/.vscode/
+
+# node.js
+/node_modules/
+/package-lock.json
+
+# macOS Finder
+.DS_Store

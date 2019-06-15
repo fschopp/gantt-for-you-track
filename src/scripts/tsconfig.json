@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    // No need to cut off older Node versions.
+    "target": "es5",
+
+    // Enable all strict type-checking options.
+    "strict": true,
+
+    "outDir": "../../target/scripts",
+
+    // Allow to import CommonJS modules using the regular syntax (as opposed to "import = require('module')")
+    "esModuleInterop": true
+  }
+}

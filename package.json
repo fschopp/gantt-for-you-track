@@ -1,0 +1,82 @@
+{
+  "name": "@fschopp/gantt-for-you-track",
+  "version": "0.1.0",
+  "description": "Gantt charts for YouTrack. Computes a project plan for the unresolved issues in a YouTrack saved search and visualizes it as Gantt chart, together with the past activity log.",
+  "keywords": [
+    "Gantt",
+    "YouTrack",
+    "project planning",
+    "scheduling"
+  ],
+  "author": "Florian Schoppmann <mail@florian-schoppmann.net> (https://florian-schoppmann.net)",
+  "license": "GPL-2.0",
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "src/main/index.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fschopp/gantt-for-you-track.git"
+  },
+  "homepage": "https://github.com/fschopp/gantt-for-you-track",
+  "bugs": {
+    "url": "https://github.com/fschopp/gantt-for-you-track/issues"
+  },
+  "files": [
+    "/src/css",
+    "/src/html",
+    "/src/main"
+  ],
+  "scripts": {
+    "clean": "rm -rf dist/ target/",
+    "lint": "tslint --format verbose --project .",
+    "test": "jest",
+    "test:coverage": "npm run test -- --collect-coverage",
+    "compile": "tsc && tsc -p src/scripts/ && node target/scripts/surplus-compiler.js target/main/*.jsx",
+    "doc": "typedoc",
+    "run": "parcel serve --cache-dir target/parcel-cache --out-dir target/run --public-url /gantt-for-you-track/ src/html/index.html",
+    "site": "parcel build --cache-dir target/parcel-cache --out-dir target/site --public-url /gantt-for-you-track/ src/html/index.html",
+    "package": "npm run clean && npm run lint && npm run test:coverage && npm run compile && npm run doc && npm run site && src/scripts/gh_pages.sh"
+  },
+  "browserslist": [
+    "defaults"
+  ],
+  "engines": {
+    "node": ">=10.0.0"
+  },
+  "dependencies": {
+    "@fschopp/project-planning-for-you-track": "^0.9.1",
+    "@fschopp/project-planning-ui-for-you-track": "^0.2.0",
+    "dhtmlx-gantt": "^6.1.6",
+    "s-js": "^0.4.9",
+    "surplus": "^0.5.3",
+    "surplus-mixin-data": "^0.5.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.4.5",
+    "@babel/preset-env": "^7.4.5",
+    "@types/jest": "^24.0.14",
+    "@types/node": "^12.0.8",
+    "babel-plugin-unassert": "^3.0.1",
+    "babel-polyfill": "^6.26.0",
+    "jest": "^24.8.0",
+    "parcel-bundler": "^1.12.3",
+    "source-map": "^0.7.3",
+    "ts-jest": "^24.0.2",
+    "tslint": "^5.17.0",
+    "typedoc": "TypeStrong/typedoc#29df793c31f0dad6f74e029159a7a224f2aee14f",
+    "typescript": "^3.5.2"
+  },
+  "jest": {
+    "collectCoverageFrom": [
+      "**/src/main/**/*.ts"
+    ],
+    "coverageDirectory": "target/coverage",
+    "testMatch": [
+      "**/src/spec/**/*.spec.ts"
+    ],
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    }
+  }
+}

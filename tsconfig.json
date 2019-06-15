@@ -1,0 +1,47 @@
+{
+  "compilerOptions": {
+    // We use ECMAScript 2017 language features such as async/await. We rely on Babel for transpiling to older
+    // JavaScript where necessary.
+    "target": "es2017",
+
+    // If we were to use Parcel to transpile our TypeScript assets, see the configuration at:
+    // https://github.com/fschopp/project-planning-for-you-track/blob/v0.9.0/tsconfig.json
+
+    // Enable all strict type-checking options.
+    "strict": true,
+
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "outDir": "target/main",
+    "moduleResolution": "node",
+
+    // Allow to import CommonJS modules using the regular syntax (as opposed to "import = require('module')")
+    "esModuleInterop": true,
+
+    "jsx": "preserve",
+    "jsxFactory": "Surplus"
+  },
+  "files": [
+    // From https://www.typescriptlang.org/docs/handbook/tsconfig-json.html:
+    // "Any files that are referenced by files included via the "files" or "include" properties are also included."
+    // It is therefore sufficient to list the main file here.
+
+    // For TypeDoc, any file explicitly listed here is "internal", all other files are "external". That terminology is
+    // somewhat confusing -- "internal" in the TypeDoc terminology refers to our own classes, "external" to third-party
+    // code. However, by listing only those files here that either (a) contain documentation or (b) contain no
+    // documentation but transitively include everything else, we can conveniently exclude documenting those pieces that
+    // are not meant to be exported (with option "excludeExternals").
+    "src/main/gantt-ctrl.ts",
+    "src/main/gantt-model.ts",
+    "src/main/gantt-view.tsx",
+    "src/main/index.ts"
+  ],
+  "typedocOptions": {
+    "excludePrivate": true,
+    "excludeExternals": true,
+    "excludeNotExported": true,
+    "mode": "file",
+    "out": "target/doc"
+  }
+}
