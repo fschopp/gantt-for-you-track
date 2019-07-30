@@ -4,12 +4,13 @@ Gantt charts for YouTrack. Computes a project plan for the unresolved issues in 
 
 [![Build Status](https://travis-ci.org/fschopp/gantt-for-you-track.svg?branch=master)](https://travis-ci.org/fschopp/gantt-for-you-track)
 [![Coverage Status](https://coveralls.io/repos/github/fschopp/gantt-for-you-track/badge.svg?branch=master)](https://coveralls.io/github/fschopp/gantt-for-you-track?branch=master)
+[![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/fschopp/gantt-for-you-track.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/fschopp/gantt-for-you-track/context:javascript)
 
 ## Overview
 
 - Try it [here and now](https://fschopp.github.io/gantt-for-you-track/).
 - Based on:
-  - [fschopp/project-planning-ui-for-you-track](https://github.com/fschopp/project-planning-ui-for-you-track) for the overall layout and configuration of the web app.
+  - [fschopp/project-planning-ui-for-you-track](https://github.com/fschopp/project-planning-ui-for-you-track) for its user-interface framework and for configuring the connection to YouTrack.
   - [fschopp/project-planning-for-you-track](https://github.com/fschopp/project-planning-ui-for-you-track) for the communication with YouTrack.
   - [fschopp/project-planning-js](https://github.com/fschopp/project-planning-js) for the list-scheduling algorithm used for scheduling the unresolved issues.
   - [adamhaile/S.js](https://github.com/adamhaile/S) and [adamhaile/Surplus](https://github.com/adamhaile/surplus) for reactive programming of the user interface.

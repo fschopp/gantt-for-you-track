@@ -11,7 +11,6 @@
 <body class="d-flex flex-column vh-100">
   <!-- Required because our browserslist settings includes older browsers without async/await support. Hence, the
        transpilation results in code for which a runtime component is necessary. -->
-  <script src="https://cdn.jsdelivr.net/npm/@babel/polyfill@7.4.4/dist/polyfill.min.js"
-    integrity="sha256-lu1gm0Fb5u5n6tuNLefOZNE96ckovOjhNzvsl+Iz50w=" crossorigin="anonymous"></script>
+  <script src="../../node_modules/regenerator-runtime/runtime.js"></script>
   <script src="../../target/main/index.js"></script>
 </body>

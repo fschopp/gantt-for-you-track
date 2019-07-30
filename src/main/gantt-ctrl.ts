@@ -1,30 +1,39 @@
 import { ProjectPlan } from '@fschopp/project-planning-for-you-track';
-import { AppCtrl, ExtendedProjectPlan } from '@fschopp/project-planning-ui-for-you-track';
+import {
+  ExtendedProjectPlan,
+  ProjectPlanningAppComputation,
+  ProjectPlanningAppCtrl,
+} from '@fschopp/project-planning-ui-for-you-track';
 import { strict as assert } from 'assert';
 import S from 's-js';
 import { ConcreteScale, GanttApp, GanttData, GanttLink, GanttTask, Scale } from './gantt-model';
 
 export class GanttCtrl {
-  public readonly appCtrl: AppCtrl;
   public readonly ganttData: () => GanttData | undefined;
   public readonly scale: () => ConcreteScale;
   public readonly projectPlan: () => ProjectPlan | undefined;
   public readonly planDate: () => Date | undefined;
 
-  constructor(
-      public readonly ganttApp: GanttApp
+  public static createDefaultGanttCtrl(app: GanttApp, appComputation: ProjectPlanningAppComputation): GanttCtrl {
+    const projectPlanningAppCtrl: ProjectPlanningAppCtrl =
+      ProjectPlanningAppCtrl.createDefaultProjectPlanningAppCtrl(app, appComputation);
+    return new GanttCtrl(app, projectPlanningAppCtrl);
+  }
+
+  public constructor(
+      ganttApp: GanttApp,
+      public readonly projectPlanningAppCtrl: ProjectPlanningAppCtrl
   ) {
-    this.appCtrl = new AppCtrl(ganttApp);
     this.ganttData = S(() => {
-      const extendedProjectPlan: ExtendedProjectPlan | undefined = this.appCtrl.extendedProjectPlan();
+      const extendedProjectPlan: ExtendedProjectPlan | undefined = projectPlanningAppCtrl.extendedProjectPlan();
       return extendedProjectPlan === undefined
           ? undefined
           : ganttDataFrom(extendedProjectPlan);
     });
-    this.scale = S(() => scaleFromZoom(this.ganttApp.zoom()));
-    this.projectPlan = S(() => opt(this.appCtrl.extendedProjectPlan(), 'plan'));
+    this.scale = S(() => scaleFromZoom(ganttApp.zoom()));
+    this.projectPlan = S(() => opt(projectPlanningAppCtrl.extendedProjectPlan(), 'plan'));
     this.planDate = S(() => {
-      const timestamp: number | undefined = opt(this.appCtrl.extendedProjectPlan(), 'youTrackTimestamp');
+      const timestamp: number | undefined = opt(projectPlanningAppCtrl.extendedProjectPlan(), 'youTrackTimestamp');
       return timestamp === undefined
           ? undefined
           : new Date(timestamp);

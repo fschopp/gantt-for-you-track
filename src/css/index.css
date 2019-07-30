@@ -14,32 +14,6 @@
   left: 0;
 }
 
-/*
- * Bootstrap
- * =========
- */
-
-/* Highlight the active navbar item, and let the highlighting have the full-height of the navbar. */
-
-.navbar {
-  padding-top: 0;
-  padding-bottom: 0;
-}
-
-.navbar-nav {
-  align-items: center;
-}
-
-.nav-item {
-  padding-top: 0.25rem;
-  padding-bottom: 0.25rem;
-}
-
-.nav-item.active {
-  background-color: rgba(0,0,0,.1);
-}
-
-
 /**
  * dhtmlxGantt
  * ===========

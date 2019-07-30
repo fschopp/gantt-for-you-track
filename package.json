@@ -45,27 +45,27 @@
     "node": ">=10.0.0"
   },
   "dependencies": {
-    "@fschopp/project-planning-for-you-track": "fschopp/project-planning-for-you-track#aa6d0767db87525004067aa464505f4eb78ec1a7",
-    "@fschopp/project-planning-ui-for-you-track": "fschopp/project-planning-ui-for-you-track#dd69f51f29a57f77101834f5fb980ccf29e9edb0",
-    "dhtmlx-gantt": "^6.1.6",
+    "@fschopp/project-planning-for-you-track": "fschopp/project-planning-for-you-track#6dec2d7612431016baea70e6ffb1f67079f8c082",
+    "@fschopp/project-planning-ui-for-you-track": "fschopp/project-planning-ui-for-you-track#5cca070ea7ee228ac115ae6f1a8d5cca83c4e2fa",
+    "dhtmlx-gantt": "^6.2.0",
     "s-js": "^0.4.9",
     "surplus": "^0.5.3",
     "surplus-mixin-data": "^0.5.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.4.5",
-    "@babel/preset-env": "^7.4.5",
-    "@types/jest": "^24.0.14",
-    "@types/node": "^12.0.8",
+    "@babel/core": "^7.5.5",
+    "@babel/preset-env": "^7.5.5",
+    "@types/jest": "^24.0.15",
+    "@types/node": "^12.6.8",
     "babel-plugin-unassert": "^3.0.1",
     "babel-polyfill": "^6.26.0",
     "jest": "^24.8.0",
     "parcel-bundler": "^1.12.3",
     "source-map": "^0.7.3",
     "ts-jest": "^24.0.2",
-    "tslint": "^5.17.0",
+    "tslint": "^5.18.0",
     "typedoc": "TypeStrong/typedoc#29df793c31f0dad6f74e029159a7a224f2aee14f",
-    "typescript": "^3.5.2"
+    "typescript": "^3.5.3"
   },
   "jest": {
     "collectCoverageFrom": [

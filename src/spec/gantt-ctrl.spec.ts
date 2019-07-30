@@ -2,11 +2,15 @@
 // See also: https://github.com/babel/babel/issues/5085
 import 'babel-polyfill';
 // This import is needed for mocking module '@fschopp/project-planning-ui-for-you-track', so it needs to come first!
-import MockAppCtrl from '../mocks/mock-app-ctrl';
+import MockProjectPlanningAppCtrl from '../mocks/mock-project-planning-app-ctrl';
 
 import { IssueActivity, YouTrackIssue } from '@fschopp/project-planning-for-you-track';
 import * as ProjectPlanningUiForYouTrack from '@fschopp/project-planning-ui-for-you-track';
-import { ExtendedProjectPlan } from '@fschopp/project-planning-ui-for-you-track';
+import {
+  createProjectPlanningAppComputation,
+  ExtendedProjectPlan,
+  ProjectPlanningAppComputation,
+} from '@fschopp/project-planning-ui-for-you-track';
 import S from 's-js';
 import { GanttCtrl } from '../main/gantt-ctrl';
 import { createGanttApp, GanttTask } from '../main/gantt-model';
@@ -17,16 +21,17 @@ jest.mock('@fschopp/project-planning-ui-for-you-track', () => {
   const actualModule: ProjectPlanningUiForYouTrack = jest.requireActual('@fschopp/project-planning-ui-for-you-track');
   return {
     ...actualModule,
-    AppCtrl: MockAppCtrl,
+    ProjectPlanningAppCtrl: MockProjectPlanningAppCtrl,
   };
 });
 
 test('generates GanttData if AppCtrl.extendedProjectPlan signal changes', () => {
-//  mockAppCtrlConstructor.mockReturnValue(MockAppCtrl);
-  const gantApp = createGanttApp();
+  const app = createGanttApp();
+  const appComputation: ProjectPlanningAppComputation = createProjectPlanningAppComputation();
+
   let ganttCtrl: GanttCtrl | undefined;
   S.root(() => {
-    ganttCtrl = new GanttCtrl(gantApp);
+    ganttCtrl = GanttCtrl.createDefaultGanttCtrl(app, appComputation);
   });
   if (ganttCtrl === undefined) {
     throw new Error('ganttCtrl should be defined');
@@ -61,7 +66,7 @@ test('generates GanttData if AppCtrl.extendedProjectPlan signal changes', () => 
     youTrackTimestamp: 42,
     idToExternalContributorName,
   };
-  MockAppCtrl.sharedExtendedProjectPlan(extendedProjectPlan);
+  MockProjectPlanningAppCtrl.sharedExtendedProjectPlan(extendedProjectPlan);
   const ganttTasks: GanttTask[] = ganttCtrl.ganttData()!.data;
   expect(ganttTasks.map((ganttTask) => ganttTask.id)).toEqual(['b', 'a', 'c']);
   expect([ganttTasks[0].start_date!.getTime(), ganttTasks[0].end_date!.getTime()]).toEqual([2, 6]);

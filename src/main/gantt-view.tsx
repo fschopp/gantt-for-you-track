@@ -1,11 +1,14 @@
 import {
+  Action,
   AlertsView,
   ExtendedProjectPlan,
   NavView,
   Page,
   Plain,
-  Settings,
-  SettingsView,
+  projectPlanningActionLabel,
+  ProjectPlanningAppComputation,
+  ProjectPlanningSettings,
+  ProjectPlanningSettingsView,
   WarningsView,
   withClassIff,
   YouTrackMetadata,
@@ -13,51 +16,75 @@ import {
 } from '@fschopp/project-planning-ui-for-you-track';
 import 'dhtmlx-gantt';
 import 'dhtmlx-gantt/codebase/ext/dhtmlxgantt_marker';
+import 'dhtmlx-gantt/codebase/ext/dhtmlxgantt_tooltip';
 import S, { DataSignal } from 's-js';
-// noinspection ES6UnusedImports
-import * as Surplus from 'surplus';
+import * as Surplus from 'surplus'; // lgtm [js/unused-local-variable]
 import data from 'surplus-mixin-data';
 import { GanttCtrl } from './gantt-ctrl';
-import { ConcreteScale, GanttData, GanttTask } from './gantt-model';
+import { ConcreteScale, GanttApp, GanttData, GanttTask } from './gantt-model';
 
-export function GanttStyleElement({ctrl}: {ctrl: GanttCtrl}): HTMLElement {
-  return <style>
-        {cssFrom(ctrl.appCtrl.extendedProjectPlan(), ctrl.appCtrl.youTrackMetadata())}
-      </style>;
+export function GanttStyleElement(
+    {appComputation, ctrl}:
+      {
+        appComputation: ProjectPlanningAppComputation;
+        ctrl: GanttCtrl;
+      }
+    ): HTMLElement {
+  return (
+      <style>
+        {cssFrom(ctrl.projectPlanningAppCtrl.extendedProjectPlan(), appComputation.youTrackMetadata())}
+      </style>
+  );
 }
 
-export function GanttView({ctrl}: {ctrl: GanttCtrl}): Element[] {
-  return Array.from((<div>
-      <NavView className="flex-grow-0 flex-shrink-0" appCtrl={ctrl.appCtrl} />
-      {/* See https://stackoverflow.com/a/36247448 for "overflow-hidden" */}
-      <main class="position-relative overflow-hidden flex-shrink-1 flex-grow-1 border-top"
-            role="main">
-        <div class="overflow-hidden position-absolute fill-parent d-flex flex-column"
-             fn={withClassIff(() => ctrl.ganttApp.currentPage() !== Page.HOME, 'invisible')}>
-          <div class="d-flex align-items-center border-bottom px-3 py-2">
-            <label for="zoom" class="mb-0">🔍</label>
-            <input class="custom-range ml-2" type="range" id="zoom" min="0" max="425" step="1"
-                   fn={data(ctrl.ganttApp.zoom)}/>
+export function GanttView(
+    {app, appComputation, ctrl}:
+      {
+        app: GanttApp;
+        appComputation: ProjectPlanningAppComputation;
+        ctrl: GanttCtrl;
+      }
+    ): HTMLElement {
+  return (
+      <div>
+        <NavView appName={appComputation.name} currentPage={app.currentPage} progress={appComputation.progress}
+                 numWarnings={ctrl.projectPlanningAppCtrl.numWarnings}
+                 isActionBtnVisible={() =>
+                     isActionButtonVisible(ctrl.projectPlanningAppCtrl.action(), app.currentPage())}
+                 actionBtnLabel={() => projectPlanningActionLabel(ctrl.projectPlanningAppCtrl.action())}
+                 actionSignal={appComputation.doAction} />
+        {/* See https://stackoverflow.com/a/36247448 for "overflow-hidden" */}
+        <main class="position-relative overflow-hidden flex-shrink-1 flex-grow-1 border-top"
+              role="main">
+          <div class="overflow-hidden position-absolute fill-parent d-flex flex-column"
+               fn={withClassIff(() => app.currentPage() !== Page.HOME, 'invisible')}>
+            <div class="d-flex align-items-center border-bottom px-3 py-2 flex-shrink-0 flex-grow-0">
+              <label for="zoom" class="mb-0">🔍</label>
+              <input class="custom-range ml-2" type="range" id="zoom" min="0" max="425" step="1"
+                     fn={data(app.zoom)}/>
+            </div>
+            <GanttContainer className="overflow-hidden flex-shrink-1 flex-grow-1 gantt-container" ctrl={ctrl} />
           </div>
-          <GanttContainer className="overflow-hidden flex-shrink-1 flex-grow-1 gantt-container" ctrl={ctrl} />
-        </div>
-        <div class="overflow-auto position-absolute fill-parent"
-             fn={withClassIff(() => ctrl.ganttApp.currentPage() !== Page.WARNINGS, 'invisible')}>
-          <div class="container">
-            <h2 class="mt-3">Project Plan Warnings</h2>
-            <WarningsView projectPlan={ctrl.projectPlan} />
+          <div class="overflow-auto position-absolute fill-parent"
+               fn={withClassIff(() => app.currentPage() !== Page.WARNINGS, 'invisible')}>
+            <div class="container">
+              <h2 class="mt-3">Project Plan Warnings</h2>
+              <WarningsView projectPlan={ctrl.projectPlan} />
+            </div>
           </div>
-        </div>
-        <div class="overflow-auto position-absolute fill-parent"
-             fn={withClassIff(() => ctrl.ganttApp.currentPage() !== Page.SETTINGS, 'invisible')}>
-          <div class="container">
-            <h2 class="mt-3">Settings</h2>
-            <SettingsView ctrl={ctrl.appCtrl.settingsCtrl} />
+          <div class="overflow-auto position-absolute fill-parent"
+               fn={withClassIff(() => app.currentPage() !== Page.SETTINGS, 'invisible')}>
+            <form class="container was-validated">
+              <h2 class="mt-3">Settings</h2>
+              <ProjectPlanningSettingsView settings={app.settings} ctrl={ctrl.projectPlanningAppCtrl.settingsCtrl}
+                                           connectSignal={appComputation.connect}
+                                           invalidCounter={ctrl.projectPlanningAppCtrl.appCtrl.invalidCounter} />
+            </form>
           </div>
-        </div>
-      </main>
-      <AlertsView ctrl={ctrl.appCtrl.alertCtrl} />
-    </div>).children);
+        </main>
+        <AlertsView alerts={appComputation.alerts} ctrl={ctrl.projectPlanningAppCtrl.appCtrl.alertsCtrl} />
+      </div>
+  );
 }
 
 declare global {
@@ -121,7 +148,7 @@ function GanttContainer({className, ctrl}: {className: string, ctrl: GanttCtrl})
     label: 'Task name',
     width: '*',
     template: (task: GanttTask) =>
-        `<a href="${task.youTrackBaseUrl}youtrack/issue/${task.id}" target="_blank">${task.id}</a>: ${task.text}`,
+        `<a href="${task.youTrackBaseUrl}issue/${task.id}" target="_blank">${task.id}</a>: ${task.text}`,
     tree: true,
   }];
   gantt.config.readonly = true;
@@ -260,7 +287,7 @@ function cssFrom(extendedProjectPlan: ExtendedProjectPlan | undefined,
     return css;
   }
 
-  const settings: Plain<Settings> = extendedProjectPlan.settings;
+  const settings: Plain<ProjectPlanningSettings> = extendedProjectPlan.settings;
   for (const customField of youTrackMetadata.customFields) {
     if (customField.id === settings.typeFieldId) {
       for (const enumBundleElement of
@@ -279,4 +306,9 @@ function cssFrom(extendedProjectPlan: ExtendedProjectPlan | undefined,
     }
   }
   return css;
+}
+
+function isActionButtonVisible(action: Action, page: Page): boolean {
+  return (action !== Action.NOTHING && action !== Action.COMPLETE_SETTINGS) ||
+      (action === Action.COMPLETE_SETTINGS && page !== Page.SETTINGS);
 }

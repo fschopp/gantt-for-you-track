@@ -4,7 +4,14 @@
  * Note that dhtmlxGantt is more liberal in the types than specified here. This definition is more restrictive for our
  * needs.
  */
-import { App, assignApp, createApp, jsonable, Plain } from '@fschopp/project-planning-ui-for-you-track';
+import {
+  App,
+  assignProjectPlanningApp,
+  createProjectPlanningApp,
+  jsonable,
+  Plain,
+  ProjectPlanningSettings,
+} from '@fschopp/project-planning-ui-for-you-track';
 import S, { DataSignal } from 's-js';
 
 export interface GanttTask {
@@ -118,20 +125,20 @@ export interface GanttData {
   links: GanttLink[];
 }
 
-export interface GanttApp extends App {
+export interface GanttApp extends App<ProjectPlanningSettings> {
   readonly zoom: DataSignal<number>;
 }
 
 export function createGanttApp(): GanttApp {
   return {
-    ...createApp(),
+    ...createProjectPlanningApp(),
     zoom: jsonable(S.value(0)),
   };
 }
 
 export function assignGanttApp(ganttApp: GanttApp, plain: Plain<GanttApp>) {
   S.freeze(() => {
-    assignApp(ganttApp, plain);
+    assignProjectPlanningApp(ganttApp, plain);
     ganttApp.zoom(plain.zoom);
   });
 }
