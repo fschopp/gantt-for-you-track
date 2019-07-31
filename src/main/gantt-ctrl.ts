@@ -223,8 +223,8 @@ function scaleFromZoom(zoom: number): ConcreteScale {
   const widthPerDay: number = Math.exp(zoom / 100);
   const MIN_WIDTH = 25;
   const scales: ExtendedScale[] = [
-    {unit: 'day', format: '%j', subscales: [{unit: 'week', step: 1, date: '%M %Y, week #%W'}], maxDays: 1},
-    {unit: 'week', format: 'Week #%W', subscales: [{unit: 'month', step: 1, date: '%M %Y'}], maxDays: 7},
+    {unit: 'day', format: '%j', subscales: [{unit: 'month', step: 1, date: '%M %Y'}], maxDays: 1},
+    {unit: 'week', format: '%j', subscales: [{unit: 'month', step: 1, date: '%M %Y'}], maxDays: 7},
     {unit: 'month', format: '%M', subscales: [{unit: 'year', step: 1, date: '%Y'}], maxDays: 31},
     {unit: 'year', format: '%Y', subscales: [], maxDays: 366},
   ];

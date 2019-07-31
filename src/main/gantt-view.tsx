@@ -17,7 +17,7 @@ import {
 import 'dhtmlx-gantt';
 import 'dhtmlx-gantt/codebase/ext/dhtmlxgantt_marker';
 import 'dhtmlx-gantt/codebase/ext/dhtmlxgantt_tooltip';
-import S, { DataSignal } from 's-js';
+import S from 's-js';
 import * as Surplus from 'surplus'; // lgtm [js/unused-local-variable]
 import data from 'surplus-mixin-data';
 import { GanttCtrl } from './gantt-ctrl';
@@ -111,25 +111,6 @@ function GanttContainer({className, ctrl}: {className: string, ctrl: GanttCtrl})
   bindGanttToScale(ctrl.scale);
   bindGanttToPlanDate(ctrl.planDate);
 
-  const width: DataSignal<number> = S.value(100);
-  const timelineBackground =
-      <svg class="gantt-timeline-background">
-        <defs>
-          <pattern id="timeline-background-pattern" x="-1.5" y="0" width={width()} height="100"
-                   patternUnits="userSpaceOnUse">
-            <line class="gantt-timeline-background-line" x1="1" y1="0" x2="1" y2="100" />
-          </pattern>
-        </defs>
-        <rect x="0" y="0" width="100%" height="100%" fill="url(#timeline-background-pattern)" />
-      </svg>;
-  gantt.attachEvent('onDataRender', () => {
-    // We need to ensure that this event is not triggered multiple times during an S.js transaction. Otherwise, the
-    // width may be updated to different values, which is illegal during a single S.js transaction.
-    width((ganttContainer.getElementsByClassName('gantt_scale_cell')[0]! as HTMLElement).offsetWidth);
-    if (!timelineBackground.isConnected) {
-      ganttContainer.getElementsByClassName('gantt_task_bg')[0]!.prepend(timelineBackground);
-    }
-  });
   gantt.attachEvent('onGanttLayoutReady', () => {
     // FIXME. This is somewhat of a hack in order to avoid a "double" border of 2px where the resize handle is supposed
     // to be. See above.
@@ -152,7 +133,6 @@ function GanttContainer({className, ctrl}: {className: string, ctrl: GanttCtrl})
     tree: true,
   }];
   gantt.config.readonly = true;
-  gantt.config.show_task_cells = false;
   gantt.config.show_unscheduled = true;
   gantt.config.layout = {
     cols: [{
@@ -212,6 +192,12 @@ function bindGanttToData(ganttData: () => GanttData | undefined): void {
   }, undefined, true);
 }
 
+function cssFromDayOfWeek(day: number): string {
+  return day === 0 || day === 6
+      ? 'weekend'
+      : '';
+}
+
 function bindGanttToScale(scale: () => ConcreteScale): void {
   let scheduledRender = false;
   function render() {
@@ -221,6 +207,14 @@ function bindGanttToScale(scale: () => ConcreteScale): void {
       gantt.config.date_scale = currentScale.format;
       gantt.config.subscales = currentScale.subscales;
       gantt.config.min_column_width = currentScale.minColumnWidth;
+
+      if (currentScale.unit === 'day') {
+        gantt.templates.scale_cell_class = (date) => cssFromDayOfWeek(date.getDay());
+        gantt.templates.timeline_cell_class = (ignoredTask, date) => cssFromDayOfWeek(date.getDay());
+      } else {
+        gantt.templates.timeline_cell_class = gantt.templates.scale_cell_class = () => '';
+      }
+
       gantt.render();
     }
     scheduledRender = false;
@@ -272,8 +266,8 @@ function bindGanttToPlanDate(planDate: () => Date | undefined): void {
 
 function getTaskCssClass(ignoredStartDate: Date, ignoredEndDate: Date, task: GanttTask): string {
   const cssClasses = [['type', task.typeId], ['state', task.stateId]]
-        .filter(([_, id]) => id.length > 0)
-        .map(([kind, id]) => `${kind}-${id}`);
+      .filter(([_, id]) => id.length > 0)
+      .map(([kind, id]) => `${kind}-${id}`);
   if (task.isResolved) {
     cssClasses.push('resolved-issue');
   }
