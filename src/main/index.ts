@@ -20,7 +20,7 @@ S.root(() => {
       (plainSettings) => assignProjectPlanningSettings(app.settings, plainSettings)
   );
 
-  document.head.append(GanttStyleElement({appComputation, ctrl}));
+  document.head.append(GanttStyleElement({ctrl}));
   document.body.append(...GanttView({app, appComputation, ctrl}).children);
 });
 

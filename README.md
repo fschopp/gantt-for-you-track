@@ -21,7 +21,7 @@ Gantt charts for YouTrack. Computes a project plan for the unresolved issues in 
 
 ## License
 
-[GNU General Public License, version 2](LICENSE) ([matching dhtmlxGantt](https://dhtmlx.com/docs/products/licenses.shtml))
+[GNU General Public License, version 2](LICENSE) (same as [dhtmlxGantt](https://dhtmlx.com/docs/products/licenses.shtml))
 
 ## Build
 

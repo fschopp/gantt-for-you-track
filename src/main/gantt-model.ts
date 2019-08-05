@@ -14,6 +14,74 @@ import {
 } from '@fschopp/project-planning-ui-for-you-track';
 import S, { DataSignal } from 's-js';
 
+/**
+ * A contributor to a Gantt task.
+ */
+export interface GanttContributor {
+  /**
+   * Whether this contributor is an external contributor.
+   */
+  isExternal: boolean;
+
+  /**
+   * If {@link isExternal} is false, the YouTrack-internal ID of the user (contributor).
+   */
+  id: string;
+
+  /**
+   * The name of the contributor.
+   *
+   * If for some reason the name is unknown (for instance, because YouTrack metadata changed), this property is
+   * `undefined`.
+   */
+  name: string | undefined;
+
+  /**
+   * If {@link isExternal} is false, the URL to the user avatar.
+   */
+  avatarUrl?: string;
+
+  /**
+   * The index of the corresponding contributor in {@link ProjectPlanningSettings.contributors}.
+   *
+   * This property allows sorting of contributors according to the order in the settings.
+   */
+  ordinal: number;
+}
+
+/**
+ * The type of a {@link GanttTask}.
+ */
+export enum GanttTaskType {
+  /**
+   * The {@link GanttTask} is the main task object; that is, it corresponds to a `YouTackIssue`. It shows the total time
+   * span of all `IssueActivity` objects, *including* those of sub-issues.
+   */
+  MAIN = 'main',
+
+  /**
+   * The {@link GanttTask} corresponds to a parent `YouTrackIssue`. It shows the total time span of its own
+   * `IssueActivity` objects (*excluding* sub-issues).
+   */
+  PARENT_ONLY = 'parent_only',
+
+  /**
+   * The {@link GanttTask} corresponds to an `IssueActivity` of a `YouTrackIssue` that has more than one activity.
+   *
+   * If the issue has no sub-issues, then the main {@link GanttTask} has {@link GanttTask.render} set to `'split'`.
+   * Otherwise, there is is another {@link GanttTask} with type {@link PARENT_ONLY} that has {@link GanttTask.render}
+   * set to `'split'`. In either case, the {@link GanttTask.parent} property of the current {@link GanttTask} is set to
+   * the split task object.
+   */
+  ACTIVITY = 'activity',
+}
+
+/**
+ * A [dhtmlxGantt task](https://docs.dhtmlx.com/gantt/desktop__loading.html#dataproperties) object.
+ *
+ * If the {@link GanttTask.render} property of the parent task is `'split'`, then the current instance only represents a
+ * task fragment (and it corresponds to an `IssueActivity`).
+ */
 export interface GanttTask {
   /**
    * The task id.
@@ -60,24 +128,91 @@ export interface GanttTask {
   // All fields below are custom fields not defined by dhtmlxGantt
 
   /**
-   * Base URL of the YouTrack instance where this issue was retrieved from.
+   * The type of this object.
    */
-  youTrackBaseUrl: string;
+  ganttTaskType: GanttTaskType;
 
   /**
-   * Whether the issue has been resolved in YouTrack.
+   * Contributors for this task or task fragment.
+   *
+   * If the YouTrack issue is not splittable and the task fragment extends into the future, then this is a singleton
+   * array containing {@link assignee}. Otherwise, this array may have an arbitrary size. For fragments in the past, it
+   * may also be empty.
+   */
+  contributors: GanttContributor[];
+
+  /**
+   * Whether this task or task fragment represents wait time.
+   */
+  isWaiting: boolean;
+
+  /**
+   * Whether this task or task fragment is (at least partially) in the future.
+   */
+  isInFuture: boolean;
+
+  /**
+   * The 0-based index of this task fragment among all *non-waiting* task fragment; or -1 if {@link ganttTaskType} is
+   * not {@link GanttTaskType.ACTIVITY}.
+   *
+   * See also {@link GanttIssue.totalNumActivities}.
+   */
+  index: number;
+
+  /**
+   * The issue.
+   *
+   * Note that a {@link GanttTask} can also represent issue activities, hence there is a 1:n relationship between
+   * {@link GanttIssue} and {@link GanttTask}.
+   */
+  issue: GanttIssue;
+}
+
+/**
+ * An issue with all relevant information for a Gantt chart.
+ */
+export interface GanttIssue {
+  /**
+   * The issue ID.
+   */
+  id: string;
+
+  /**
+   * URL of this issue.
+   */
+  url: string;
+
+  /**
+   * Whether the corresponding issue has been resolved in YouTrack.
    */
   isResolved: boolean;
 
   /**
-   * The YouTrack-internal ID of the type of the issue.
+   * The YouTrack-internal ID of the type of the corresponding issue.
    */
   typeId: string;
 
   /**
-   * The YouTrack-internal ID of the state of the issue.
+   * The YouTrack-internal ID of the state of the corresponding issue.
    */
   stateId: string;
+
+  /**
+   * The YouTrack assignee of the corresponding issue (if known).
+   */
+  assignee?: GanttContributor;
+
+  /**
+   * Whether the corresponding issue has children (sub-issues).
+   */
+  hasSubIssues: boolean;
+
+  /**
+   * Total number of *non-waiting* activities.
+   *
+   * See also {@link GanttTask.index}.
+   */
+  totalNumActivities: number;
 }
 
 /**
@@ -127,12 +262,14 @@ export interface GanttData {
 
 export interface GanttApp extends App<ProjectPlanningSettings> {
   readonly zoom: DataSignal<number>;
+  readonly issueListWidth: DataSignal<number>;
 }
 
 export function createGanttApp(): GanttApp {
   return {
     ...createProjectPlanningApp(),
     zoom: jsonable(S.value(0)),
+    issueListWidth: jsonable(S.value(250)),
   };
 }
 
@@ -140,6 +277,7 @@ export function assignGanttApp(ganttApp: GanttApp, plain: Plain<GanttApp>) {
   S.freeze(() => {
     assignProjectPlanningApp(ganttApp, plain);
     ganttApp.zoom(plain.zoom);
+    ganttApp.issueListWidth(plain.issueListWidth);
   });
 }
 

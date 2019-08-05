@@ -1,6 +1,6 @@
-// Since some (transpiled) dependencies define async functions, we need the Babel polyfill.
-// See also: https://github.com/babel/babel/issues/5085
-import 'babel-polyfill';
+// Some dependencies define async functions, yet they are transpiled to target older browsers, too. For that reason,
+// they rely on the 'regenerator-runtime' (without including it themselves). We need to provide it therefore.
+import 'regenerator-runtime';
 // This import is needed for mocking module '@fschopp/project-planning-ui-for-you-track', so it needs to come first!
 import MockProjectPlanningAppCtrl from '../mocks/mock-project-planning-app-ctrl';
 
@@ -13,7 +13,7 @@ import {
 } from '@fschopp/project-planning-ui-for-you-track';
 import S from 's-js';
 import { GanttCtrl } from '../main/gantt-ctrl';
-import { createGanttApp, GanttTask } from '../main/gantt-model';
+import { createGanttApp, GanttTask, GanttTaskType } from '../main/gantt-model';
 
 
 type ProjectPlanningUiForYouTrack = typeof ProjectPlanningUiForYouTrack;
@@ -39,8 +39,10 @@ test('generates GanttData if AppCtrl.extendedProjectPlan signal changes', () => 
 
   expect(ganttCtrl.ganttData()).toEqual(undefined);
 
-  const settings: any = {};
-  const idToExternalContributorName = new Map<string, string>();
+  const settings: Partial<ExtendedProjectPlan['settings']> = {
+    youTrackBaseUrl: 'http://fake-youtrack/',
+  };
+  const idToContributorIdx = new Map<string, number>();
   const extendedProjectPlan: ExtendedProjectPlan = {
     plan: {
       issues: [
@@ -62,15 +64,27 @@ test('generates GanttData if AppCtrl.extendedProjectPlan signal changes', () => 
       ],
       warnings: [],
     },
-    settings,
+    settings: settings as ExtendedProjectPlan['settings'],
     youTrackTimestamp: 42,
-    idToExternalContributorName,
+    idToContributorIdx,
   };
   MockProjectPlanningAppCtrl.sharedExtendedProjectPlan(extendedProjectPlan);
   const ganttTasks: GanttTask[] = ganttCtrl.ganttData()!.data;
-  expect(ganttTasks.map((ganttTask) => ganttTask.id)).toEqual(['b', 'a', 'c']);
-  expect([ganttTasks[0].start_date!.getTime(), ganttTasks[0].end_date!.getTime()]).toEqual([2, 6]);
-  expect([ganttTasks[1].start_date!.getTime(), ganttTasks[1].end_date!.getTime()]).toEqual([2, 5]);
+  expect(ganttTasks.map((ganttTask) => [ganttTask.issue.id, ganttTask.ganttTaskType])).toEqual([
+    ['b', GanttTaskType.MAIN],
+    ['b', GanttTaskType.PARENT_ONLY],
+    ['a', GanttTaskType.MAIN],
+    ['c', GanttTaskType.MAIN],
+  ]);
+  expect(ganttTasks.map((task) => (task.start_date !== undefined && task.end_date !== undefined)
+      ? [task.start_date.getTime(), task.end_date.getTime()]
+      : undefined
+  )).toEqual([
+    [2, 6],
+    [3, 6],
+    [2, 5],
+    undefined,
+  ]);
 });
 
 function defaultIssue(): YouTrackIssue {

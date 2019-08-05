@@ -24,6 +24,7 @@
   margin: -1px -2px -2px -1px;
 }
 
+/* Resize handle needs to provide multiple pixels where it can be dragged. */
 .horizontal-divider-resize-handle {
   cursor: ew-resize;
   position: absolute;
@@ -45,15 +46,70 @@
   text-decoration-line: line-through;
 }
 
+
+/*
+ * When at the day scale, highlight weekends.
+ */
+
 .gantt_task_cell.weekend, .gantt_scale_cell.weekend {
   background-color: #f8f9fa;
 }
 
-/*
- * dhtmlxGantt computes the size of the subscale such that it covers the bottom border of the enclosing
+.gantt_task_row.gantt_selected .gantt_task_cell.weekend {
+  background-color: #ffec6e;
+}
+
+
+/* dhtmlxGantt computes the size of the subscale such that it covers the bottom border of the enclosing
  * div.gantt_task_scale. As a workaround, we set bottom-border for the cell element (it’s transparent for non-weekend
- * cells).
- */
+ * cells). */
 .gantt_scale_cell.weekend {
   border-bottom: 1px solid #cecece;
+}
+
+/* Dim Gantt task bars representing wait time. */
+.gantt_task_line.waiting {
+  opacity: 0.5;
+}
+
+
+/*
+ * User icon and name in tooltips.
+ */
+
+.youtrack-user {
+  background-size: auto 32px;
+  background-repeat: no-repeat;
+  background-position-y: center;
+  min-height: 32px;
+  padding-left: 40px;
+  display: flex;
+  align-items: center;
+}
+
+.youtrack-user:not(:last-child) {
+  margin-bottom: 3px;
+}
+
+
+/*
+ * Show visual clues that indicate a task bar belongs to a parent issue.
+ */
+
+.gantt_bar_task.parent::before, .gantt_bar_task.parent::after {
+  display: inline-block;
+  position: absolute;
+  content: '';
+  bottom: -6px;
+  border-bottom: 6px solid transparent;
+}
+
+.gantt_bar_task.parent::before {
+  left: -1px;
+  border-left: 6px solid #2898b0;
+}
+
+.gantt_bar_task.parent::after {
+  right: -1px;
+  border-right: 6px solid #2898b0;
 }
