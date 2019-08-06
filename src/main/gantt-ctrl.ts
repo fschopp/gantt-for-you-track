@@ -167,7 +167,10 @@ function ganttDataFrom({plan, settings, youTrackTimestamp}: ExtendedProjectPlan,
       const issue: ExtendedIssue = node.issue;
       const parentIssue: ExtendedIssue = parentNode.issue;
       if (parentIssue.overallTimespan === undefined) {
-        parentIssue.overallTimespan = node.issue.overallTimespan;
+        // It's important to create a new object here!
+        parentIssue.overallTimespan = node.issue.overallTimespan === undefined
+            ? undefined
+            : {...node.issue.overallTimespan};
       } else {
         parentIssue.overallTimespan.start =
             Math.min(parentIssue.overallTimespan.start, coalesce(opt(issue.overallTimespan, 'start'), Infinity));
