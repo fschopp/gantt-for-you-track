@@ -1,7 +1,7 @@
 {
   "name": "@fschopp/gantt-for-you-track",
   "version": "0.2.0-SNAPSHOT",
-  "description": "Gantt charts for YouTrack. Computes a project plan for the unresolved issues in a YouTrack saved search and visualizes it as Gantt chart, together with the past activity log.",
+  "description": "Gantt charts for YouTrack. Web app that builds a Gantt chart from the issues in a YouTrack saved search. Includes both the past (reconstructed from activity log) and the future (computed from issue metadata).",
   "keywords": [
     "Gantt",
     "YouTrack",
